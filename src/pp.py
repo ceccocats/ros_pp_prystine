@@ -15,7 +15,7 @@ L = 3.170
 pp_k = 0.01
 pp_look_ahead = 15
 
-max_steer = 0.2
+max_steer = 1.1
 accel_limit = 0.3
 accel = 0
 start_accel_limit = 0.1
@@ -27,6 +27,7 @@ static_throttle = 0.2
 path_to_follow = 0
 
 speed_target = 10
+stop = False
 
 # car sim state
 state = { "x": 0, "y": 0, "speed": 0, "yaw": 0, "accel": 0, "brake": 0}
@@ -96,6 +97,7 @@ def sem_callback(data):
     sem_state["sem_status"] = data.sem_status
     sem_state["time_to_change"] = data.time_to_change
     sem_state["distance"] = calc_distance([data.position.position.x, data.position.position.y], state["x"], state["y"])
+    #sem_state["distance"] = data.distance
 
 def dms_callback(data):
 
@@ -172,13 +174,20 @@ if __name__ == '__main__':
         #p_pos =  path.cur_s + L*state["speed"]*1.8
         p_pos =  path.cur_s + 0.1 * pp_k * state["speed"] + pp_look_ahead
 
-        accel =+ 0.6 * (speed_target - state["speed"])
+        '''accel =+ 0.6 * (speed_target - state["speed"])
         if accel < -1: accel = -1
-        if accel > 1: accel = 1
+        if accel > 1: accel = 1'''
 
+        speed = speed_target
         # frena se ricevo segnale dms/ostacolo
-        '''if(dms_status == 1):
-            state["brake"] = '''
+        if dms_status:
+            stop = True
+
+        if stop:
+            if(state["speed"] < 3.0):
+                speed = -0.5
+            else:
+                speed = 0.0
 
         # Start accelerating in a smooth way
         #accel = min(accel, start_accel_limit)   # limit speed at start
@@ -195,29 +204,13 @@ if __name__ == '__main__':
         local_trg = [local_straight[0]*math.cos(state["yaw"]) + local_straight[1]*math.sin(state["yaw"]), \
             -local_straight[0]*math.sin(state["yaw"]) + local_straight[1]*math.cos(state["yaw"])]
         print("----------------------------",local_trg)        
-        steer = pp_step(local_trg, state["speed"]) * 12.6
+        steer = pp_step(local_trg, state["speed"]) #* 12.6
 
         '''print "STEER COMMAND: ", steer
         print "CURRENT SPEED", state["speed"]
         print "TARGET SPEED", speed_target
         print "CURRENT ACCEL", accel
         print "LookAhead distance ----> ",  pp_k * state["speed"] + pp_look_ahead'''
-
-        '''p = PoseStamped()
-        p.header.frame_id = 'map'
-        p.pose.position.x = state["x"] 
-        p.pose.position.y = state["y"]
-        p.pose.orientation = Quaternion(*euler_to_quaternion(0,0,state["yaw"]))
-
-        g = PoseStamped()
-        g.header.frame_id = 'map'
-        g.pose.position.x = trg[0] 
-        g.pose.position.y = trg[1]
-
-        o = PoseStamped()
-        o.header.frame_id = 'map'
-        o.pose.position.x = 0 
-        o.pose.position.y = 0'''
 
         # actuate
         msg = ControlOutputData()
@@ -226,14 +219,9 @@ if __name__ == '__main__':
         h.stamp = now
         msg.header = h
         msg.steerAngle = steer
-        msg.accel = max(accel, accel_limit)
+        msg.speed = speed
         
-
         pub_drive.publish(msg)
-        '''pub_pose.publish(p)
-        pub_goal.publish(g)
-        pub_orig.publish(o)
-        pub_path.publish(p_msg)'''
 
         #r.sleep()
         tot_time = time.time() - t2

@@ -1,3 +1,2 @@
-float64 steerAngle   		     #Scalar value [-1.0,1.0]
-float64 accel                        #It's the throttle, scalar value [0.0, 1.0]
-float64 brake
+float64 steerAngle   		     #Scalar value [-1.0,1.0] radians
+float64 speed                        #m/s negative->brake
