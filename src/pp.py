@@ -35,7 +35,7 @@ check_traffic_light = False
 state = { "x": 0, "y": 0, "speed": 0, "yaw": 0, "accel": 0, "brake": 0}
 
 #sem state
-sem_state = { "dist": 0, "status": 0, "time_to_change": 0}
+sem_state = { "distance": 0, "status": 0, "time_to_change": 0}
 
 #0 ok, 1 emergency, should stop
 dms_status = 0
@@ -137,15 +137,15 @@ if __name__ == '__main__':
     i_error = 0
 
     # spline to follow
-    xs_ref, ys_ref = load_flag_path("path.trj")
+    xs_ref, ys_ref = load_flag_path("mock1.trj")
     path_ref = Spline2D(xs_ref, ys_ref)
 
-    xs_right, ys_right = load_flag_path("path_right.trj")
+    xs_right, ys_right = load_flag_path("mock2.trj")
     path_right = Spline2D(xs_right, ys_right)
 
-    s = np.linspace(0, path.s[-1]-0.0001, 2000)
+    '''s = np.linspace(0, path.s[-1]-0.0001, 2000)
     s_x = [ path.calc_position(t)[0] for t in s ]
-    s_y = [ path.calc_position(t)[1] for t in s ]
+    s_y = [ path.calc_position(t)[1] for t in s ]'''
 
     '''p_msg = build_path_msg([ path.calc_position(t)[0] for t in np.linspace(0.1, path.s[-1]-0.0001, 200) ],
                     [ path.calc_position(t)[1] for t in np.linspace(0.1, path.s[-1]-0.0001, 200) ])'''
@@ -219,17 +219,17 @@ if __name__ == '__main__':
         print("----------------------------",local_trg)        
         steer = pp_step(local_trg, state["speed"]) #* 12.6
 
-        print "STEER COMMAND: ", steer
-        print "CURRENT SPEED", state["speed"]
-        print "TARGET SPEED", speed
-        print "LookAhead distance ----> ",  pp_k * state["speed"] + pp_look_ahead
+        print("STEER COMMAND: ", steer)
+        print("CURRENT SPEED", state["speed"])
+        print("TARGET SPEED", speed)
+        print("LookAhead distance ----> ",  pp_k * state["speed"] + pp_look_ahead)
 
         # actuate
         msg = ControlOutputData()
         h = Header()
         now = rospy.Time.now()
         h.stamp = now
-        msg.header = h
+        #msg.header = h
         msg.steerAngle = steer
         msg.speed = speed
         
