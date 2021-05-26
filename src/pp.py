@@ -29,6 +29,8 @@ path_to_follow = 0
 speed_target = 10
 stop = False
 
+check_traffic_light = False
+
 # car sim state
 state = { "x": 0, "y": 0, "speed": 0, "yaw": 0, "accel": 0, "brake": 0}
 
@@ -179,6 +181,17 @@ if __name__ == '__main__':
         if accel > 1: accel = 1'''
 
         speed = speed_target
+
+        if(check_traffic_light and sem_passed == False):
+            if(sem_state["sem_status"] == 3):
+                #rosso
+                speed = sem_state["distance"] / sem_state["time_to_change"]
+            elif(sem_state["sem_status"] == 2):
+                #giallo
+                speed = sem_state["distance"] / (sem_state["time_to_change"] + 10)
+        
+        min(speed, speed_target)
+
         # frena se ricevo segnale dms/ostacolo
         if dms_status:
             stop = True
@@ -206,11 +219,10 @@ if __name__ == '__main__':
         print("----------------------------",local_trg)        
         steer = pp_step(local_trg, state["speed"]) #* 12.6
 
-        '''print "STEER COMMAND: ", steer
+        print "STEER COMMAND: ", steer
         print "CURRENT SPEED", state["speed"]
-        print "TARGET SPEED", speed_target
-        print "CURRENT ACCEL", accel
-        print "LookAhead distance ----> ",  pp_k * state["speed"] + pp_look_ahead'''
+        print "TARGET SPEED", speed
+        print "LookAhead distance ----> ",  pp_k * state["speed"] + pp_look_ahead
 
         # actuate
         msg = ControlOutputData()
