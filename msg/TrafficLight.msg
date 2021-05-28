@@ -1,3 +1,7 @@
-geometry_msgs/Pose position
-uint8 sem_status #1 green, 2 yellow, 3 red
+geometry_msgs/Pose position #cartesian
+float64 latitude
+float64 longitude
+uint8 orientation
+
+uint8 sem_status
 float64 time_to_change
