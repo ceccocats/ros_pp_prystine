@@ -1,20 +1,13 @@
-float64 CAR_WHEELBASE
-float64 CAR_DIM_X
-float64 CAR_DIM_Y
-float64 CAR_DIM_Z
-float64 CAR_MASS
-float64[] CAR_WHEEL_R
-
 geometry_msgs/Pose world_position
 float64 speed
-float64 speedKMH
+float64 speed_kmh
 
-float64 yawRate
-float64 accelX
-float64 accelY
+float64 yaw_rate
+float64 accel_x
+float64 accel_y
 
-float64 steerAngle
-uint8 brakePedalSts
+float64 steer_angle
+uint8 brake_pedal_sts
 
-uint8 actualGear
-uint16 RPM
+uint8 actual_gear
+uint16 rpm
